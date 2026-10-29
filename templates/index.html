@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mora Leads Checker</title>
+<style>
+:root{color-scheme:dark;--bg:#08111f;--panel:#101d30;--line:#293b55;--text:#edf4ff;--muted:#9db0c9;--gold:#f4c66a;--teal:#48d7c5}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top right,#173653,transparent 38%),var(--bg);color:var(--text);font:15px/1.5 system-ui,sans-serif}
+button,input,select,textarea{font:inherit}
+.wrap{max-width:1150px;margin:auto;padding:24px 16px 48px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:12px}
+.mark{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,var(--gold),#b98025);color:#101827;font-size:21px;font-weight:900}
+.brand h1{font-size:20px;margin:0}
+.brand p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(290px,.9fr);gap:18px}
+.panel{min-width:0;background:rgba(16,29,48,.96);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 18px 50px #0002}
+.panel h2{margin:0 0 6px;font-size:18px}
+.desc{margin:0 0 18px;color:var(--muted)}
+.muted{color:var(--muted)}
+label{display:block;margin:14px 0 7px;font-weight:650}
+input:not([type=checkbox]):not([type=file]),select,textarea{width:100%;padding:12px 13px;color:var(--text);background:#091626;border:1px solid #344964;border-radius:10px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--teal)}
+textarea{min-height:230px;resize:vertical;font:14px/1.6 ui-monospace,Consolas,monospace}
+.row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:13px}
+.btn{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:pointer}
+.btn:disabled{opacity:.55;cursor:wait}
+.primary{background:var(--gold);color:#172033}
+.secondary{background:#1b2c44;color:var(--text);border:1px solid #344964}
+.notice{padding:12px 13px;border:1px solid #344d67;border-radius:11px;background:#0b192a;color:#bdcfe5;font-size:13px}
+.notice strong{color:var(--gold)}
+.fieldgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.security-label{color:var(--muted);font-size:12px;margin-top:6px}
+.check{display:flex;align-items:flex-start;gap:9px;margin:16px 0;color:var(--muted);font-size:13px;font-weight:400}
+.check input{margin-top:4px;accent-color:var(--teal)}
+.status{margin-top:12px;color:var(--muted);font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:17px 0}
+.stat{border:1px solid var(--line);background:#0b192a;padding:12px;border-radius:11px}
+.stat span{display:block;font-size:12px;color:var(--muted)}
+.stat b{font-size:22px}
+.tablewrap{overflow:auto;margin-top:15px}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:13px}
+th,td{padding:11px 9px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+th{color:var(--muted);font-weight:600}
+.tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#1c3b43;color:#8ff0d8;font-size:11px}
+.tag.bad{background:#482a31;color:#ffc0c0}
+.tag.unknown{background:#3c3524;color:#f4d991}
+.footer{margin-top:22px;text-align:center;color:#7489a4;font-size:12px}
+@media(max-width:780px){.grid{grid-template-columns:1fr}.panel{padding:17px}.wrap{padding:16px 12px 32px}}
+@media(max-width:440px){.fieldgrid{grid-template-columns:1fr}.top{align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div class="brand">
+    <div class="mark">M</div>
+    <div>
+      <h1>Mora Leads Checker</h1>
+      <p>SMTP CONFIGURATION · HELLO TEST EMAIL</p>
+    </div>
+  </div>
+  <form method="post" action="/logout">
+    <button class="btn secondary" type="submit">Sign out</button>
+  </form>
+</header>
+
+<section class="panel">
+  <h2>SMTP Configuration</h2>
+  <p class="desc">Enter the sending account for this session. Credentials are not saved by this page.</p>
+  <div class="notice">
+    <strong>Gmail / Google Workspace:</strong>
+    use an App Password if your account permits it. The hosting provider must allow outbound SMTP.
+  </div>
+
+  <div class="fieldgrid">
+    <div>
+      <label for="smtpHost">SMTP Host</label>
+      <input id="smtpHost" type="text" value="smtp.gmail.com" autocomplete="off">
+    </div>
+    <div>
+      <label for="smtpPort">SMTP Port</label>
+      <select id="smtpPort">
+        <option value="587" selected>587 — STARTTLS</option>
+        <option value="465">465 — SSL/TLS</option>
+      </select>
+      <div id="securityLabel" class="security-label">Security: STARTTLS</div>
+    </div>
+    <div>
+      <label for="smtpUsername">SMTP Username / Email</label>
+      <input id="smtpUsername" type="email" placeholder="you@gmail.com" autocomplete="off">
+    </div>
+    <div>
+      <label for="smtpPassword">SMTP App Password</label>
+      <input id="smtpPassword" type="password" placeholder="Enter app password" autocomplete="new-password">
+    </div>
+    <div>
+      <label for="senderEmail">Sender Email</label>
+      <input id="senderEmail" type="email" placeholder="you@gmail.com" autocomplete="off">
+    </div>
+  </div>
+
+  <label class="check">
+    <input id="showPassword" type="checkbox">
+    <span>Show SMTP password while configuring</span>
+  </label>
+
+  <div class="row">
+    <button id="testBtn" class="btn secondary" type="button">Test SMTP Connection</button>
+    <button id="clearCredentialsBtn" class="btn secondary" type="button">Clear Credentials</button>
+  </div>
+  <div id="smtpStatus" class="status" role="status" aria-live="polite"></div>
+</section>
+
+<div class="grid" style="margin-top:18px">
+<section class="panel">
+  <h2>Send a Hello test</h2>
+  <p class="desc">Plain-text message only. No confirmation links, tracking pixels, or attachments.</p>
+  <div class="notice">Only send to recipients who expect or have agreed to receive the test email.</div>
+
+  <label for="emails">Email addresses</label>
+  <textarea id="emails" spellcheck="false" placeholder="person@example.com&#10;another@example.org"></textarea>
+
+  <div class="row">
+    <button id="fileBtn" class="btn secondary" type="button">Import TXT / CSV</button>
+    <input id="file" type="file" accept=".txt,.csv,text/plain,text/csv" hidden>
+    <button id="clearListBtn" class="btn secondary" type="button">Clear List</button>
+    <span id="count" class="muted">0 unique addresses</span>
+  </div>
+
+  <label class="check">
+    <input id="consent" type="checkbox">
+    <span>I confirm these recipients expect or have agreed to receive this test message.</span>
+  </label>
+
+  <div class="row">
+    <button id="sendBtn" class="btn primary" type="button">Send Hello Test</button>
+    <span class="muted">Maximum {{ max_per_batch }} recipients per batch</span>
+  </div>
+  <div id="sendStatus" class="status" role="status" aria-live="polite"></div>
+</section>
+
+<aside class="panel">
+  <h2>Batch Summary</h2>
+  <p class="desc">Results describe SMTP submission, not guaranteed inbox delivery.</p>
+  <div class="stats">
+    <div class="stat"><span>Total</span><b id="total">0</b></div>
+    <div class="stat"><span>Accepted</span><b id="accepted">0</b></div>
+    <div class="stat"><span>Other</span><b id="other">0</b></div>
+  </div>
+  <div class="notice"><strong>Accepted for sending</strong><br>The SMTP server accepted the message. It may still bounce or be filtered.</div>
+  <div class="notice" style="margin-top:10px"><strong>No inbox guarantee</strong><br>This app does not automatically collect bounce reports or certify mailbox existence.</div>
+  <div class="notice" style="margin-top:10px"><strong>Daily limit</strong><br>Maximum {{ max_per_day }} attempted messages per UTC day in this running instance. The counter resets when the service restarts.</div>
+</aside>
+</div>
+
+<section class="panel" style="margin-top:18px">
+  <div class="row" style="justify-content:space-between;margin-top:0">
+    <div>
+      <h2>Batch Results</h2>
+      <p class="desc" style="margin:3px 0 0">Export results to CSV.</p>
+    </div>
+    <button id="exportBtn" class="btn secondary" type="button" disabled>Export CSV</button>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Email</th><th>Status</th><th>Details</th></tr></thead>
+      <tbody id="results"><tr><td colspan="3" class="muted">No results yet.</td></tr></tbody>
+    </table>
+  </div>
+</section>
+<div class="footer">Mora Leads Checker · Use HTTPS and keep your SMTP app password private.</div>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+let latestResults = [];
+
+function parseAddresses(text) {
+  const seen = new Set(), output = [];
+  for (const line of text.replace(/[;,]/g, "\n").split(/\r?\n/)) {
+    const address = line.trim();
+    if (address && !seen.has(address.toLowerCase())) {
+      seen.add(address.toLowerCase());
+      output.push(address);
+    }
+  }
+  return output;
+}
+
+function updateCount() {
+  $("count").textContent = parseAddresses($("emails").value).length + " unique addresses";
+}
+
+function smtpPayload() {
+  return {
+    host: $("smtpHost").value.trim(),
+    port: $("smtpPort").value,
+    security: $("smtpPort").value === "465" ? "ssl" : "starttls",
+    username: $("smtpUsername").value.trim(),
+    password: $("smtpPassword").value,
+    sender: $("senderEmail").value.trim()
+  };
+}
+
+async function postJson(url, payload) {
+  const response = await fetch(url, {
+    method: "POST",
+    credentials: "same-origin",
+    cache: "no-store",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(payload)
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || "The server request failed.");
+  return data;
+}
+
+function invalidateSmtpTest() {
+  $("smtpStatus").textContent = "";
+}
+
+["smtpHost","smtpUsername","smtpPassword","senderEmail"].forEach(id => {
+  $(id).addEventListener("input", invalidateSmtpTest);
+});
+$("smtpPort").addEventListener("change", () => {
+  $("securityLabel").textContent =
+    $("smtpPort").value === "465" ? "Security: SSL/TLS" : "Security: STARTTLS";
+  invalidateSmtpTest();
+});
+$("showPassword").addEventListener("change", () => {
+  $("smtpPassword").type = $("showPassword").checked ? "text" : "password";
+});
+$("clearCredentialsBtn").addEventListener("click", () => {
+  ["smtpUsername","smtpPassword","senderEmail"].forEach(id => $(id).value = "");
+  $("showPassword").checked = false;
+  $("smtpPassword").type = "password";
+  invalidateSmtpTest();
+});
+
+$("testBtn").addEventListener("click", async () => {
+  const payload = smtpPayload();
+  if (!payload.username || !payload.password || !payload.sender) {
+    $("smtpStatus").textContent = "Enter the SMTP username, app password, and sender email first.";
+    return;
+  }
+  $("testBtn").disabled = true;
+  $("smtpStatus").textContent = "Testing SMTP connection…";
+  try {
+    const data = await postJson("/api/test-smtp", payload);
+    $("smtpStatus").textContent = "✓ " + data.message;
+  } catch (error) {
+    $("smtpStatus").textContent = error.message;
+  } finally {
+    $("testBtn").disabled = false;
+  }
+});
+
+$("emails").addEventListener("input", updateCount);
+$("fileBtn").addEventListener("click", () => $("file").click());
+$("file").addEventListener("change", async event => {
+  const file = event.target.files[0];
+  if (!file) return;
+  const content = await file.text();
+  $("emails").value = ($("emails").value.trim() ? $("emails").value.trim() + "\n" : "") + content;
+  updateCount();
+  event.target.value = "";
+});
+
+function renderResults(rows) {
+  const body = $("results");
+  body.replaceChildren();
+  if (!rows.length) {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 3;
+    td.className = "muted";
+    td.textContent = "No results yet.";
+    tr.appendChild(td);
+    body.appendChild(tr);
+    return;
+  }
+  for (const row of rows) {
+    const tr = document.createElement("tr");
+    const email = document.createElement("td");
+    email.textContent = row.email;
+    const status = document.createElement("td");
+    const tag = document.createElement("span");
+    tag.className = "tag";
+    if (row.status === "Invalid format" || row.status === "Rejected by SMTP server") tag.classList.add("bad");
+    else if (row.status !== "Accepted for sending") tag.classList.add("unknown");
+    tag.textContent = row.status;
+    status.appendChild(tag);
+    const detail = document.createElement("td");
+    detail.textContent = row.detail;
+    tr.append(email, status, detail);
+    body.appendChild(tr);
+  }
+}
+
+$("clearListBtn").addEventListener("click", () => {
+  $("emails").value = "";
+  $("consent").checked = false;
+  latestResults = [];
+  updateCount();
+  renderResults([]);
+  $("sendStatus").textContent = "";
+  $("total").textContent = "0";
+  $("accepted").textContent = "0";
+  $("other").textContent = "0";
+  $("exportBtn").disabled = true;
+});
+
+$("sendBtn").addEventListener("click", async () => {
+  if (!parseAddresses($("emails").value).length) {
+    $("sendStatus").textContent = "Enter at least one email address.";
+    return;
+  }
+  if (!$("consent").checked) {
+    $("sendStatus").textContent = "Confirm recipient permission before sending.";
+    return;
+  }
+  const smtp = smtpPayload();
+  if (!smtp.username || !smtp.password || !smtp.sender) {
+    $("sendStatus").textContent = "Complete the SMTP configuration first.";
+    return;
+  }
+
+  $("sendBtn").disabled = true;
+  $("sendStatus").textContent = "Sending Hello test messages…";
+  latestResults = [];
+  $("exportBtn").disabled = true;
+
+  try {
+    const data = await postJson("/api/send", {
+      ...smtp,
+      emails: $("emails").value,
+      confirm: true
+    });
+    latestResults = data.results || [];
+    renderResults(latestResults);
+    $("total").textContent = data.summary.total;
+    $("accepted").textContent = data.summary.accepted_for_sending;
+    $("other").textContent = data.summary.not_accepted_or_invalid;
+    $("exportBtn").disabled = !latestResults.length;
+    $("sendStatus").textContent = data.summary.note || "Finished.";
+  } catch (error) {
+    $("sendStatus").textContent = error.message;
+  } finally {
+    $("sendBtn").disabled = false;
+  }
+});
+
+$("exportBtn").addEventListener("click", () => {
+  const escapeCsv = value => '"' + String(value ?? "").replace(/"/g, '""') + '"';
+  const rows = [
+    ["Email","Status","Details"],
+    ...latestResults.map(row => [row.email,row.status,row.detail])
+  ];
+  const csv = rows.map(row => row.map(escapeCsv).join(",")).join("\r\n");
+  const url = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "mora-hello-test-results.csv";
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+updateCount();
+</script>
+</body>
+</html>
